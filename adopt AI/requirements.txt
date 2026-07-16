@@ -1,0 +1,93 @@
+# Core Framework
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Data Processing
+pandas==2.0.3
+numpy==1.24.3
+scipy==1.11.1
+
+# Machine Learning
+scikit-learn==1.3.0
+xgboost==1.7.6
+joblib==1.3.1
+
+# Visualization
+plotly==5.15.0
+matplotlib==3.7.2
+seaborn==0.12.2
+
+# PDF Generation
+fpdf==1.7.2
+reportlab==4.0.4
+
+# Voice/Speech Recognition
+SpeechRecognition==3.10.0
+pyttsx3==2.90
+pyaudio==0.2.11
+
+# API and HTTP Requests
+requests==2.31.0
+urllib3==2.0.4
+
+# File Handling
+python-multipart==0.0.6
+pillow==10.0.0
+
+# Security and Cryptography
+hashlib
+pycryptodome==3.18.0
+
+# Database (Optional - for user management)
+flask-sqlalchemy==3.0.5
+flask-login==0.6.2
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Image Processing (for medical image analysis)
+opencv-python==4.8.0.74
+
+# Additional ML Libraries (optional but impressive)
+lightgbm==4.0.0
+catboost==1.2
+
+# Time Series Analysis
+statsmodels==0.14.0
+
+# For ECG Signal Processing
+biosppy==2.1.0
+heartpy==1.2.7
+
+# For Blockchain Simulation
+web3==6.11.1
+
+# For AI/ML Model Interpretability
+shap==0.42.1
+lime==0.2.0.1
+
+# For Model Performance Metrics
+yellowbrick==1.5
+
+# For Data Validation
+pydantic==2.1.1
+
+# For Caching
+redis==4.6.0
+
+# For Background Tasks
+celery==5.3.1
+
+# For WebSockets (real-time updates)
+flask-socketio==5.3.4
+python-socketio==5.9.0
+
+# For Testing
+pytest==7.4.0
+pytest-cov==4.1.0
+
+# For API Documentation
+flasgger==0.9.7.1
+
+# For Logging
+loguru==0.7.2

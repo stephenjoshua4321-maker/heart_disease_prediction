@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Heart Disease Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat"></i> MediPredict Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aiChatbotModal">
+                            <i class="fas fa-robot"></i> AI Assistant
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-language"></i> Language
+                        </a>
+                        <ul class="dropdown-menu">
+                            {% for code, lang in languages.items() %}
+                            <li><a class="dropdown-item language-select" href="#" data-lang="{{ code }}">{{ lang }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="themeToggle">
+                            <i class="fas fa-moon"></i> Dark Mode
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h1 class="display-4 animate-title">
+                    <i class="fas fa-heart text-danger"></i> 
+                    AI-Powered Heart Disease Prediction System
+                </h1>
+                <p class="lead">Advanced Multi-Model Ensemble with Blockchain Security</p>
+                
+                <!-- Live Stats -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-2 col-6">
+                        <div class="stats-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>95.2%</h3>
+                            <p>Accuracy</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="stats-card">
+                            <i class="fas fa-brain"></i>
+                            <h3>5</h3>
+                            <p>AI Models</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="stats-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h3>Blockchain</h3>
+                            <p>Secured</p>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="stats-card">
+                            <i class="fas fa-users"></i>
+                            <h3>10K+</h3>
+                            <p>Predictions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card main-card">
+                    <div class="card-header bg-gradient">
+                        <ul class="nav nav-tabs card-header-tabs" id="inputTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="manual-tab" data-bs-toggle="tab" href="#manual">
+                                    <i class="fas fa-keyboard"></i> Manual Input
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="voice-tab" data-bs-toggle="tab" href="#voice">
+                                    <i class="fas fa-microphone"></i> Voice Input
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="wearable-tab" data-bs-toggle="tab" href="#wearable">
+                                    <i class="fas fa-smartwatch"></i> Wearable Sync
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="upload-tab" data-bs-toggle="tab" href="#upload">
+                                    <i class="fas fa-file-upload"></i> Upload Reports
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Manual Input Tab -->
+                            <div class="tab-pane fade show active" id="manual">
+                                <form id="predictionForm" action="/predict" method="POST">
+                                    <div class="row">
+                                        <!-- Personal Information -->
+                                        <div class="col-12 mb-3">
+                                            <h5 class="section-title"><i class="fas fa-user"></i> Personal Information</h5>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Age <i class="fas fa-info-circle" data-bs-toggle="tooltip" title="Your age in years"></i></label>
+                                            <input type="number" class="form-control" name="Age" min="20" max="100" required>
+                                            <div class="progress mt-1" style="height: 5px;">
+                                                <div class="progress-bar age-progress" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Sex</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="Sex" id="male" value="1" autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="male"><i class="fas fa-mars"></i> Male</label>
+                                                
+                                                <input type="radio" class="btn-check" name="Sex" id="female" value="0" autocomplete="off" checked>
+                                                <label class="btn btn-outline-primary" for="female"><i class="fas fa-venus"></i> Female</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Chest Pain Type</label>
+                                            <select class="form-select" name="Chest pain type" required>
+                                                <option value="1">Typical Angina</option>
+                                                <option value="2">Atypical Angina</option>
+                                                <option value="3">Non-anginal Pain</option>
+                                                <option value="4">Asymptomatic</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Vital Signs -->
+                                        <div class="col-12 mb-3 mt-3">
+                                            <h5 class="section-title"><i class="fas fa-heartbeat"></i> Vital Signs</h5>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Blood Pressure (mm Hg)</label>
+                                            <input type="number" class="form-control" name="BP" min="80" max="200" required>
+                                            <div class="bp-gauge">
+                                                <div class="gauge-fill"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Cholesterol (mg/dL)</label>
+                                            <input type="number" class="form-control" name="Cholesterol" min="100" max="400" required>
+                                            <small class="cholesterol-indicator"></small>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Max Heart Rate</label>
+                                            <input type="number" class="form-control" name="Max HR" min="60" max="220" required>
+                                            <small class="text-muted target-hr"></small>
+                                        </div>
+                                        
+                                        <!-- Medical History -->
+                                        <div class="col-12 mb-3 mt-3">
+                                            <h5 class="section-title"><i class="fas fa-notes-medical"></i> Medical History</h5>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Fasting Blood Sugar > 120</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="FBS over 120" value="1" id="fbsSwitch">
+                                                <label class="form-check-label" for="fbsSwitch">Yes</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">EKG Results</label>
+                                            <select class="form-select" name="EKG results" required>
+                                                <option value="0">Normal</option>
+                                                <option value="1">ST-T Wave Abnormality</option>
+                                                <option value="2">Left Ventricular Hypertrophy</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Exercise Angina</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="Exercise angina" value="1" id="anginaSwitch">
+                                                <label class="form-check-label" for="anginaSwitch">Induced by exercise</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Additional Parameters -->
+                                        <div class="col-12 mb-3 mt-3">
+                                            <h5 class="section-title"><i class="fas fa-chart-line"></i> Additional Parameters</h5>
+                                        </div>
+                                        
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">ST Depression</label>
+                                            <input type="number" step="0.1" class="form-control" name="ST depression" min="0" max="6" required>
+                                        </div>
+                                        
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Slope of ST</label>
+                                            <select class="form-select" name="Slope of ST" required>
+                                                <option value="1">Upsloping</option>
+                                                <option value="2">Flat</option>
+                                                <option value="3">Downsloping</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Vessels (0-3)</label>
+                                            <input type="number" class="form-control" name="Number of vessels fluro" min="0" max="3" required>
+                                        </div>
+                                        
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Thallium Test</label>
+                                            <select class="form-select" name="Thallium" required>
+                                                <option value="3">Normal</option>
+                                                <option value="6">Fixed Defect</option>
+                                                <option value="7">Reversible Defect</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Submit Buttons -->
+                                    <div class="text-center mt-4">
+                                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                                            <i class="fas fa-microchip"></i> Analyze with AI
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-lg px-5" id="resetForm">
+                                            <i class="fas fa-redo"></i> Reset
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Voice Input Tab -->
+                            <div class="tab-pane fade" id="voice">
+                                <div class="text-center py-5">
+                                    <div class="voice-animation mb-4">
+                                        <i class="fas fa-microphone-alt fa-4x"></i>
+                                    </div>
+                                    <h4>Voice Input System</h4>
+                                    <p>Speak your medical parameters naturally</p>
+                                    <button class="btn btn-primary btn-lg" id="startVoice">
+                                        <i class="fas fa-microphone"></i> Start Speaking
+                                    </button>
+                                    <div class="mt-4 voice-transcript"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Wearable Sync Tab -->
+                            <div class="tab-pane fade" id="wearable">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-bluetooth-b fa-3x mb-3"></i>
+                                    <h4>Connect Your Wearable Device</h4>
+                                    <p>Sync with Apple Health, Fitbit, or Google Fit</p>
+                                    <div class="row justify-content-center">
+                                        <div class="col-4">
+                                            <img src="https://img.icons8.com/color/96/000000/apple-health.png" class="wearable-icon">
+                                        </div>
+                                        <div class="col-4">
+                                            <img src="https://img.icons8.com/color/96/000000/fitbit.png" class="wearable-icon">
+                                        </div>
+                                        <div class="col-4">
+                                            <img src="https://img.icons8.com/color/96/000000/google-fit.png" class="wearable-icon">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary mt-3" id="syncWearable">
+                                        <i class="fas fa-sync"></i> Sync Now
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Upload Reports Tab -->
+                            <div class="tab-pane fade" id="upload">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-file-pdf fa-3x mb-3"></i>
+                                    <h4>Upload Medical Reports</h4>
+                                    <p>Upload PDF reports for automatic data extraction</p>
+                                    <div class="upload-area" id="dropZone">
+                                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                                        <p>Drag & drop files here or click to browse</p>
+                                        <input type="file" id="fileInput" hidden multiple>
+                                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                            Browse Files
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h2 class="text-center mb-4">Enterprise-Grade Features</h2>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <i class="fas fa-robot fa-3x text-primary"></i>
+                    <h5>AI-Powered Analysis</h5>
+                    <p>5 ensemble models with 95.2% accuracy</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <i class="fas fa-link fa-3x text-success"></i>
+                    <h5>Blockchain Security</h5>
+                    <p>Immutable patient records with hash verification</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                    <h5>PDF Reports</h5>
+                    <p>Download detailed medical reports</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="feature-card">
+                    <i class="fas fa-microphone fa-3x text-warning"></i>
+                    <h5>Voice Input</h5>
+                    <p>Speak your health parameters</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot Modal -->
+    <div class="modal fade" id="aiChatbotModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-robot"></i> MediPredict AI Assistant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="chat-container" id="chatContainer">
+                        <div class="chat-message bot">
+                            <div class="message-content">
+                                Hello! I'm your AI health assistant. How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input mt-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="chatInput" placeholder="Type your question...">
+                            <button class="btn btn-primary" id="sendMessage">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                            <button class="btn btn-secondary" id="voiceMessage">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

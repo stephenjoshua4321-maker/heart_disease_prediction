@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results - Heart Disease Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --warning-color: #fbbf24;
+            --danger-color: #f56565;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin: 30px auto;
+            padding: 30px;
+            max-width: 1400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .risk-gauge {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        .risk-value {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .risk-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 10px 30px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .low-risk {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #22543d;
+        }
+
+        .moderate-risk {
+            background: linear-gradient(135deg, #fad0c4 0%, #ff9a9e 100%);
+            color: #744210;
+        }
+
+        .high-risk {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #742a2a;
+        }
+
+        .graph-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            height: 100%;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .graph-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .graph-container {
+            width: 100%;
+            height: 350px;
+        }
+
+        .doctor-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateX(10px);
+        }
+
+        .doctor-card i {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .wearable-card {
+            background: #2d3748;
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wearable-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .blockchain-badge {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .nav-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .nav-button:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .feature-badge {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .risk-value {
+                font-size: 3rem;
+            }
+            .graph-container {
+                height: 300px;
+            }
+        }
+
+        /* Dark mode support */
+        body.dark-mode .main-container {
+            background: #1a202c;
+            color: white;
+        }
+
+        body.dark-mode .result-card,
+        body.dark-mode .graph-card {
+            background: #2d3748;
+            color: white;
+        }
+
+        body.dark-mode .feature-badge {
+            background: #4a5568;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-heartbeat"></i> MediPredict Pro
+            </a>
+            <div class="ms-auto">
+                <a href="/" class="nav-button">
+                    <i class="fas fa-home"></i> New Analysis
+                </a>
+                <button class="nav-button" id="downloadReport">
+                    <i class="fas fa-download"></i> Download Report
+                </button>
+                <button class="nav-button" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loadingSpinner"></div>
+
+        <!-- Risk Assessment Result -->
+        <div class="result-card text-center">
+            <div class="risk-gauge">
+                <div style="width:100%;height:100%;" id="riskGauge"></div>
+            </div>
+            
+            <div class="risk-value" id="riskPercentage">
+                {{ "%.1f"|format(result.probability * 100) }}%
+            </div>
+            
+            <div class="risk-label {{ result.risk_level|lower|replace(' ', '-') }} mb-3" id="riskLevel">
+                {{ result.risk_level }}
+            </div>
+            
+            <div class="blockchain-badge">
+                <i class="fas fa-link"></i> 
+                Blockchain Hash: <span id="blockchainHash">{{ result.block_hash }}</span>
+                <button class="btn btn-sm btn-success ms-2" onclick="verifyBlockchain()">
+                    <i class="fas fa-check-circle"></i> Verify
+                </button>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-3 col-6">
+                    <div class="feature-badge">
+                        <i class="fas fa-brain"></i> 5 AI Models
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-badge">
+                        <i class="fas fa-chart-line"></i> 15+ Analytics
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-badge">
+                        <i class="fas fa-shield-alt"></i> Blockchain Secured
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="feature-badge">
+                        <i class="fas fa-robot"></i> AI Powered
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Input Summary -->
+        <div class="result-card">
+            <h4 class="mb-3"><i class="fas fa-user-md"></i> Patient Health Profile</h4>
+            <div class="row">
+                {% for i in range(feature_names|length) %}
+                <div class="col-md-3 col-sm-6 mb-2">
+                    <span class="badge bg-primary">{{ feature_names[i] }}:</span>
+                    <span class="badge bg-info">{{ features[i] }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="result-card">
+            <h4 class="mb-3"><i class="fas fa-robot"></i> AI Health Insights</h4>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> {{ ai_insights }}
+            </div>
+        </div>
+
+        <!-- Graphs Grid -->
+        <div class="row">
+            {% for i in range(15) %}
+            <div class="col-lg-6 col-md-12">
+                <div class="graph-card">
+                    <div id="graph{{ i }}" class="graph-container"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Doctors Near You -->
+        <div class="result-card">
+            <h4 class="mb-3"><i class="fas fa-stethoscope"></i> Nearby Cardiologists</h4>
+            <div class="row">
+                {% for doctor in doctors %}
+                <div class="col-md-6">
+                    <div class="doctor-card">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-md"></i>
+                            <div>
+                                <h5 class="mb-1">{{ doctor.name }}</h5>
+                                <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ doctor.address }}</p>
+                                <p class="mb-1"><i class="fas fa-phone"></i> {{ doctor.phone }}</p>
+                                <p class="mb-0"><i class="fas fa-star text-warning"></i> {{ doctor.rating }} ({{ doctor.distance }})</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Wearable Data -->
+        <div class="result-card">
+            <h4 class="mb-3"><i class="fas fa-smartwatch"></i> Live Wearable Data</h4>
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="wearable-card">
+                        <i class="fas fa-heartbeat fa-2x mb-2"></i>
+                        <div class="wearable-value" id="heartRate">{{ wearable_data.heart_rate }}</div>
+                        <div>Heart Rate (bpm)</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="wearable-card">
+                        <i class="fas fa-tachometer-alt fa-2x mb-2"></i>
+                        <div class="wearable-value" id="bloodPressure">{{ wearable_data.blood_pressure }}</div>
+                        <div>Blood Pressure</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="wearable-card">
+                        <i class="fas fa-shoe-prints fa-2x mb-2"></i>
+                        <div class="wearable-value" id="steps">{{ wearable_data.steps }}</div>
+                        <div>Steps Today</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="wearable-card">
+                        <i class="fas fa-fire fa-2x mb-2"></i>
+                        <div class="wearable-value" id="calories">{{ wearable_data.calories }}</div>
+                        <div>Calories (kcal)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Series Analysis -->
+        <div class="result-card">
+            <h4 class="mb-3"><i class="fas fa-history"></i> 30-Day Health Trends</h4>
+            <div id="timeSeriesGraph" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load graphs from Flask
+        const graphs = {{ graphs|safe }};
+        
+        // Load all graphs when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load main graphs
+            for (let i = 0; i < graphs.length; i++) {
+                try {
+                    const graphData = JSON.parse(graphs[i]);
+                    Plotly.newPlot(`graph${i}`, graphData.data, graphData.layout, {
+                        responsive: true,
+                        displaylogo: false,
+                        modeBarButtonsToRemove: ['lasso2d', 'select2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']
+                    });
+                } catch (e) {
+                    console.log(`Error loading graph ${i}:`, e);
+                }
+            }
+            
+            // Create risk gauge
+            createRiskGauge();
+            
+            // Create time series graph
+            createTimeSeriesGraph();
+        });
+        
+        function createRiskGauge() {
+            const riskValue = {{ result.probability * 100 }};
+            const riskLevel = "{{ result.risk_level }}";
+            
+            const data = [{
+                type: "indicator",
+                mode: "gauge+number",
+                value: riskValue,
+                title: { text: "Risk Score", font: { size: 16 } },
+                number: { suffix: "%", font: { size: 24 } },
+                gauge: {
+                    axis: { range: [0, 100], tickwidth: 1, tickcolor: "darkblue" },
+                    bar: { color: riskLevel === 'Low Risk' ? '#48bb78' : (riskLevel === 'Moderate Risk' ? '#fbbf24' : '#f56565') },
+                    bgcolor: "white",
+                    borderwidth: 2,
+                    bordercolor: "gray",
+                    steps: [
+                        { range: [0, 30], color: "#c6f6d5" },
+                        { range: [30, 60], color: "#fefcbf" },
+                        { range: [60, 100], color: "#fed7d7" }
+                    ],
+                    threshold: {
+                        line: { color: "red", width: 4 },
+                        thickness: 0.75,
+                        value: riskValue
+                    }
+                }
+            }];
+            
+            const layout = {
+                width: 300,
+                height: 200,
+                margin: { t: 25, r: 25, l: 25, b: 25 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'darkblue', family: 'Arial' }
+            };
+            
+            Plotly.newPlot('riskGauge', data, layout, {displayModeBar: false});
+        }
+        
+        function createTimeSeriesGraph() {
+            const timeSeries = {{ time_series|safe }};
+            
+            const trace1 = {
+                x: timeSeries.dates,
+                y: timeSeries.heart_rate,
+                mode: 'lines+markers',
+                name: 'Heart Rate',
+                line: { color: '#f56565', width: 2 }
+            };
+            
+            const trace2 = {
+                x: timeSeries.dates,
+                y: timeSeries.blood_pressure_systolic,
+                mode: 'lines+markers',
+                name: 'BP Systolic',
+                line: { color: '#48bb78', width: 2 },
+                yaxis: 'y2'
+            };
+            
+            const layout = {
+                title: '30-Day Health Metrics',
+                xaxis: { title: 'Date' },
+                yaxis: { title: 'Heart Rate (bpm)', range: [50, 120] },
+                yaxis2: {
+                    title: 'Blood Pressure (mmHg)',
+                    overlaying: 'y',
+                    side: 'right',
+                    range: [90, 160]
+                },
+                height: 400,
+                showlegend: true,
+                legend: { orientation: 'h', y: -0.2 }
+            };
+            
+            Plotly.newPlot('timeSeriesGraph', [trace1, trace2], layout, {responsive: true});
+        }
+        
+        // Download PDF Report
+        document.getElementById('downloadReport').addEventListener('click', function() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            const patientData = {{ features|safe }};
+            const result = {{ result|safe }};
+            
+            fetch('/api/download-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_data: patientData,
+                    result: result,
+                    risk_level: result.risk_level
+                })
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'heart_disease_report.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.getElementById('loadingSpinner').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('Error downloading report. Please try again.');
+            });
+        });
+        
+        // Verify Blockchain
+        function verifyBlockchain() {
+            const hash = document.getElementById('blockchainHash').textContent;
+            
+            fetch('/api/blockchain-verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hash: hash })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.verified) {
+                    alert('✅ Blockchain verified! Record is authentic and unmodified.');
+                } else {
+                    alert('❌ Verification failed! Record may be tampered.');
+                }
+            });
+        }
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const icon = this.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+        
+        // Update wearable data in real-time
+        function updateWearableData() {
+            fetch('/api/wearable-data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('heartRate').textContent = data.heart_rate;
+                    document.getElementById('bloodPressure').textContent = data.blood_pressure;
+                    document.getElementById('steps').textContent = data.steps;
+                    document.getElementById('calories').textContent = data.calories;
+                });
+        }
+        
+        // Update every 30 seconds
+        setInterval(updateWearableData, 30000);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            for (let i = 0; i < graphs.length; i++) {
+                const element = document.getElementById(`graph${i}`);
+                if (element) {
+                    Plotly.Plots.resize(element);
+                }
+            }
+            Plotly.Plots.resize(document.getElementById('riskGauge'));
+            Plotly.Plots.resize(document.getElementById('timeSeriesGraph'));
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
